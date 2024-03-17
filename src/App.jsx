@@ -9,7 +9,7 @@ function App() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (tareaIngresada.trim().length > 3) {
+    if (tareaIngresada.trim().length >= 3 && tareaIngresada.trim().length <= 30) {
       setTareas([
         ...tareas,
         {
@@ -45,7 +45,6 @@ function App() {
               submitHandler={submitHandler}
               handleChange={handleChange}
               value={tareaIngresada}
-              
             />
           </div>
 
