@@ -45,7 +45,6 @@ function App() {
         );
         setTareas(tareasFiltradas);
       }
-      console.log(respuesta);
     } catch (error) {
       console.log(error);
     }
