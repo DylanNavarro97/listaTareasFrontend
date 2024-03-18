@@ -2,21 +2,31 @@ import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import { Input } from "./Input";
 import { ListaTareas } from "./ListaTareas";
-import { obtenerTareas } from "./helpers/queries";
+import { crearTarea, obtenerTareas } from "./helpers/queries";
 
 function App() {
   const [tareaIngresada, setTareaIngresada] = useState("");
   const [tareas, setTareas] = useState([]);
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    if (tareaIngresada.trim().length >= 3 && tareaIngresada.trim().length <= 30) {
-      setTareas([
-        ...tareas,
-        {
-          nombre: tareaIngresada,
-        },
-      ]);
+    if (
+      tareaIngresada.trim().length >= 3 &&
+      tareaIngresada.trim().length <= 30
+    ) {
+      const nuevaTarea = {
+        nombre: tareaIngresada,
+      };
+
+      try {
+        const respuesta = await crearTarea(nuevaTarea);
+        if (respuesta.status === 201) {
+          setTareas([...tareas, nuevaTarea]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
       setTareaIngresada("");
     } else {
       alert("Ingresa una tarea válida");
@@ -36,16 +46,16 @@ function App() {
 
   const cargarTareas = async () => {
     try {
-      const respuesta = await obtenerTareas()
-      setTareas(respuesta)
+      const respuesta = await obtenerTareas();
+      setTareas(respuesta);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  useEffect(()=> {
-    cargarTareas()
-  }, [])
+  useEffect(() => {
+    cargarTareas();
+  }, []);
 
   return (
     <>

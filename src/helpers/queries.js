@@ -10,3 +10,18 @@ export const obtenerTareas = async () => {
         console.log(error)
     }
 }
+
+export const crearTarea = async (tarea) => {
+    try {
+        const respuesta = await fetch (`${tareas_URL}`, {
+            method: "POST",
+            headers:{
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify(tarea)
+        })
+        return respuesta
+    } catch (error) {
+        console.log(error)
+    }
+}
