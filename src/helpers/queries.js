@@ -25,3 +25,14 @@ export const crearTarea = async (tarea) => {
         console.log(error)
     }
 }
+
+export const eliminarTarea = async (id) => {
+    try {
+        const respuesta = await fetch (`${tarea_URL}/${id}`, {
+            method: "DELETE"
+        })
+        return respuesta
+    } catch (error) {
+        console.log(error)
+    }
+}

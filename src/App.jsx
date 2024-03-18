@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import { Input } from "./Input";
 import { ListaTareas } from "./ListaTareas";
-import { crearTarea, obtenerTareas } from "./helpers/queries";
+import { crearTarea, eliminarTarea, obtenerTareas } from "./helpers/queries";
 
 function App() {
   const [tareaIngresada, setTareaIngresada] = useState("");
@@ -21,13 +21,12 @@ function App() {
       try {
         const respuesta = await crearTarea(nuevaTarea);
         if (respuesta.status === 201) {
-          setTareas([...tareas, nuevaTarea]);
+          cargarTareas()
+          setTareaIngresada("");
         }
       } catch (error) {
         console.log(error);
       }
-
-      setTareaIngresada("");
     } else {
       alert("Ingresa una tarea válida");
     }
@@ -37,11 +36,19 @@ function App() {
     setTareaIngresada(e.target.value);
   };
 
-  let handleClose = (tarea) => {
-    let tareasFiltradas = tareas.filter(
-      (tareaAlmacenada) => tareaAlmacenada.id !== tarea.id
-    );
-    setTareas(tareasFiltradas);
+  let handleDelete = async (tarea) => {
+    try {
+      const respuesta = await eliminarTarea(tarea._id);
+      if (respuesta.status === 200) {
+        let tareasFiltradas = tareas.filter(
+          (tareaAlmacenada) => tareaAlmacenada._id !== tarea._id
+        );
+        setTareas(tareasFiltradas);
+      }
+      console.log(respuesta);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const cargarTareas = async () => {
@@ -71,7 +78,7 @@ function App() {
             />
           </div>
 
-          <ListaTareas tareas={tareas} eliminar={handleClose} />
+          <ListaTareas tareas={tareas} eliminar={handleDelete} />
         </section>
       </Container>
     </>
