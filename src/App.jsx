@@ -1,23 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import { Input } from "./Input";
 import { ListaTareas } from "./ListaTareas";
+import { crearTarea, eliminarTarea, obtenerTareas } from "./helpers/queries";
 
 function App() {
   const [tareaIngresada, setTareaIngresada] = useState("");
   const [tareas, setTareas] = useState([]);
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    if (tareaIngresada.trim().length > 3) {
-      setTareas([
-        ...tareas,
-        {
-          nombre: tareaIngresada,
-          id: crypto.randomUUID(),
-        },
-      ]);
-      setTareaIngresada("");
+    if (
+      tareaIngresada.trim().length >= 3 &&
+      tareaIngresada.trim().length <= 30
+    ) {
+      const nuevaTarea = {
+        nombre: tareaIngresada,
+      };
+
+      try {
+        const respuesta = await crearTarea(nuevaTarea);
+        if (respuesta.status === 201) {
+          cargarTareas()
+          setTareaIngresada("");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       alert("Ingresa una tarea válida");
     }
@@ -27,12 +36,32 @@ function App() {
     setTareaIngresada(e.target.value);
   };
 
-  let handleClose = (tarea) => {
-    let tareasFiltradas = tareas.filter(
-      (tareaAlmacenada) => tareaAlmacenada.id !== tarea.id
-    );
-    setTareas(tareasFiltradas);
+  let handleDelete = async (tarea) => {
+    try {
+      const respuesta = await eliminarTarea(tarea._id);
+      if (respuesta.status === 200) {
+        let tareasFiltradas = tareas.filter(
+          (tareaAlmacenada) => tareaAlmacenada._id !== tarea._id
+        );
+        setTareas(tareasFiltradas);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const cargarTareas = async () => {
+    try {
+      const respuesta = await obtenerTareas();
+      setTareas(respuesta);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    cargarTareas();
+  }, []);
 
   return (
     <>
@@ -45,11 +74,10 @@ function App() {
               submitHandler={submitHandler}
               handleChange={handleChange}
               value={tareaIngresada}
-              
             />
           </div>
 
-          <ListaTareas tareas={tareas} eliminar={handleClose} />
+          <ListaTareas tareas={tareas} eliminar={handleDelete} />
         </section>
       </Container>
     </>
